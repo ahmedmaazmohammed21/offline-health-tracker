@@ -1,0 +1,17 @@
+{
+  "profile": {
+    "name": "saad",
+    "age": 20,
+    "height": 165.0,
+    "weight": 60.0,
+    "gender": "male"
+  },
+  "daily_logs": [],
+  "goals": [],
+  "reminders": [],
+  "streaks": {
+    "current": 0,
+    "best": 0,
+    "last_log_date": ""
+  }
+}

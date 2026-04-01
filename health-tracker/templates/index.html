@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthPulse - Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+</head>
+<body class="dashboard-body">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo"><i class="fas fa-heartbeat"></i></div>
+            <h2>HealthPulse</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" data-section="overview"><i class="fas fa-th-large"></i><span>Overview</span></a>
+            <a href="#" class="nav-item" data-section="log"><i class="fas fa-plus-circle"></i><span>Daily Log</span></a>
+            <a href="#" class="nav-item" data-section="analytics"><i class="fas fa-chart-bar"></i><span>Analytics</span></a>
+            <a href="#" class="nav-item" data-section="bmi"><i class="fas fa-weight"></i><span>BMI & Health</span></a>
+            <a href="#" class="nav-item" data-section="calories"><i class="fas fa-utensils"></i><span>Calories</span></a>
+            <a href="#" class="nav-item" data-section="goals"><i class="fas fa-bullseye"></i><span>Goals</span></a>
+            <a href="#" class="nav-item" data-section="reminders"><i class="fas fa-bell"></i><span>Reminders</span></a>
+            <a href="#" class="nav-item" data-section="profile"><i class="fas fa-user-cog"></i><span>Profile</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="/logout" class="nav-item logout"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
+        </div>
+    </aside>
+
+    <!-- Mobile Header -->
+    <header class="mobile-header">
+        <button class="hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        <h2><i class="fas fa-heartbeat"></i> HealthPulse</h2>
+        <a href="/logout" class="mobile-logout"><i class="fas fa-sign-out-alt"></i></a>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Overview Section -->
+        <section class="content-section active" id="section-overview">
+            <div class="section-header">
+                <h1>Welcome, {{ data.profile.name or 'User' }}! 👋</h1>
+                <p class="section-subtitle">Here's your health snapshot for today</p>
+            </div>
+
+            <!-- Streak Banner -->
+            <div class="streak-banner">
+                <div class="streak-fire"><i class="fas fa-fire"></i></div>
+                <div class="streak-info">
+                    <h3>🔥 {{ data.streaks.current }} Day Streak!</h3>
+                    <p>Best: {{ data.streaks.best }} days | Keep going!</p>
+                </div>
+                <div class="streak-badge">
+                    {% if data.streaks.current >= 30 %}🏆 Legend
+                    {% elif data.streaks.current >= 14 %}⭐ Champion
+                    {% elif data.streaks.current >= 7 %}💪 Warrior
+                    {% elif data.streaks.current >= 3 %}🌱 Growing
+                    {% else %}🚀 Start Strong{% endif %}
+                </div>
+            </div>
+
+            <!-- Quick Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card card-calories">
+                    <div class="stat-icon"><i class="fas fa-fire-flame-curved"></i></div>
+                    <div class="stat-content">
+                        <h4>Calories</h4>
+                        <p class="stat-value">{{ weekly_stats.avg_calories }}</p>
+                        <span class="stat-label">avg/day this week</span>
+                    </div>
+                </div>
+                <div class="stat-card card-water">
+                    <div class="stat-icon"><i class="fas fa-glass-water"></i></div>
+                    <div class="stat-content">
+                        <h4>Water</h4>
+                        <p class="stat-value">{{ weekly_stats.avg_water }}</p>
+                        <span class="stat-label">glasses avg/day</span>
+                    </div>
+                </div>
+                <div class="stat-card card-sleep">
+                    <div class="stat-icon"><i class="fas fa-moon"></i></div>
+                    <div class="stat-content">
+                        <h4>Sleep</h4>
+                        <p class="stat-value">{{ weekly_stats.avg_sleep }}h</p>
+                        <span class="stat-label">avg/night</span>
+                    </div>
+                </div>
+                <div class="stat-card card-steps">
+                    <div class="stat-icon"><i class="fas fa-shoe-prints"></i></div>
+                    <div class="stat-content">
+                        <h4>Steps</h4>
+                        <p class="stat-value">{{ weekly_stats.avg_steps }}</p>
+                        <span class="stat-label">avg/day</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Health Suggestions -->
+            <div class="suggestions-section">
+                <h2><i class="fas fa-lightbulb"></i> Health Suggestions</h2>
+                <div class="suggestions-grid">
+                    {% for s in suggestions %}
+                    <div class="suggestion-card" style="border-left: 4px solid {{ s.color }}">
+                        <span class="suggestion-icon">{{ s.icon }}</span>
+                        <div>
+                            <h4>{{ s.title }}</h4>
+                            <p>{{ s.text }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Weekly Mini Chart -->
+            <div class="chart-card">
+                <h3><i class="fas fa-chart-area"></i> Weekly Overview</h3>
+                <canvas id="weeklyOverviewChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Daily Log Section -->
+        <section class="content-section" id="section-log">
+            <div class="section-header">
+                <h1><i class="fas fa-plus-circle"></i> Daily Health Log</h1>
+                <p class="section-subtitle">Record today's health metrics</p>
+            </div>
+            <div class="log-form-card">
+                <form id="dailyLogForm" class="log-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label><i class="fas fa-fire-flame-curved"></i> Calories Consumed</label>
+                            <input type="number" id="logCalories" placeholder="e.g. 2000" min="0" max="10000">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-glass-water"></i> Water (glasses)</label>
+                            <input type="number" id="logWater" placeholder="e.g. 8" min="0" max="30">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-moon"></i> Sleep (hours)</label>
+                            <input type="number" id="logSleep" placeholder="e.g. 7.5" min="0" max="24" step="0.5">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-shoe-prints"></i> Steps</label>
+                            <input type="number" id="logSteps" placeholder="e.g. 8000" min="0" max="100000">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-dumbbell"></i> Exercise (minutes)</label>
+                            <input type="number" id="logExercise" placeholder="e.g. 30" min="0" max="600">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-smile"></i> Mood</label>
+                            <select id="logMood">
+                                <option value="great">😄 Great</option>
+                                <option value="good" selected>🙂 Good</option>
+                                <option value="okay">😐 Okay</option>
+                                <option value="bad">😞 Bad</option>
+                                <option value="terrible">😢 Terrible</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group full-width">
+                        <label><i class="fas fa-sticky-note"></i> Notes</label>
+                        <textarea id="logNotes" placeholder="How was your day? Any symptoms?" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary btn-lg"><i class="fas fa-save"></i> Save Today's Log</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Analytics Section -->
+        <section class="content-section" id="section-analytics">
+            <div class="section-header">
+                <h1><i class="fas fa-chart-bar"></i> Analytics Dashboard</h1>
+                <p class="section-subtitle">Your health trends over time</p>
+            </div>
+            <div class="weekly-summary">
+                <h3>📊 This Week's Summary</h3>
+                <div class="summary-row">
+                    <div class="summary-item"><span class="summary-num">{{ weekly_stats.total_logs }}</span><span class="summary-label">Days Logged</span></div>
+                    <div class="summary-item"><span class="summary-num">{{ weekly_stats.avg_calories }}</span><span class="summary-label">Avg Calories</span></div>
+                    <div class="summary-item"><span class="summary-num">{{ weekly_stats.avg_sleep }}h</span><span class="summary-label">Avg Sleep</span></div>
+                    <div class="summary-item"><span class="summary-num">{{ weekly_stats.avg_steps }}</span><span class="summary-label">Avg Steps</span></div>
+                </div>
+            </div>
+            <div class="charts-grid">
+                <div class="chart-card"><h3>Calories Trend</h3><canvas id="caloriesChart"></canvas></div>
+                <div class="chart-card"><h3>Sleep Pattern</h3><canvas id="sleepChart"></canvas></div>
+                <div class="chart-card"><h3>Steps Progress</h3><canvas id="stepsChart"></canvas></div>
+                <div class="chart-card"><h3>Water Intake</h3><canvas id="waterChart"></canvas></div>
+            </div>
+        </section>
+
+        <!-- BMI Section -->
+        <section class="content-section" id="section-bmi">
+            <div class="section-header">
+                <h1><i class="fas fa-weight"></i> BMI & Body Analysis</h1>
+                <p class="section-subtitle">Understand your body metrics</p>
+            </div>
+            <div class="bmi-dashboard">
+                <div class="bmi-gauge-card">
+                    <div class="bmi-circle" style="--bmi-color: {{ bmi_category[1] or '#6366f1' }}">
+                        <span class="bmi-number">{{ bmi }}</span>
+                        <span class="bmi-label">BMI</span>
+                    </div>
+                    <h3 style="color: {{ bmi_category[1] or '#6366f1' }}">{{ bmi_category[0] or 'Not Calculated' }}</h3>
+                    <p>{{ bmi_category[2] or 'Update your profile with height and weight.' }}</p>
+                </div>
+                <div class="bmi-scale">
+                    <h3>BMI Scale Reference</h3>
+                    <div class="scale-bar">
+                        <div class="scale-segment underweight"><span>Under 18.5</span><small>Underweight</small></div>
+                        <div class="scale-segment normal"><span>18.5 - 24.9</span><small>Normal</small></div>
+                        <div class="scale-segment overweight"><span>25 - 29.9</span><small>Overweight</small></div>
+                        <div class="scale-segment obese"><span>30+</span><small>Obese</small></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Calorie Tracker Section -->
+        <section class="content-section" id="section-calories">
+            <div class="section-header">
+                <h1><i class="fas fa-utensils"></i> Calorie Tracker</h1>
+                <p class="section-subtitle">Monitor your daily caloric intake</p>
+            </div>
+            <div class="calorie-dashboard">
+                <div class="chart-card large"><h3>30-Day Calorie History</h3><canvas id="calorieHistoryChart"></canvas></div>
+                <div class="calorie-info-cards">
+                    <div class="info-card"><i class="fas fa-apple-whole"></i><h4>Recommended</h4><p>2000-2500 cal/day</p></div>
+                    <div class="info-card"><i class="fas fa-running"></i><h4>Active Lifestyle</h4><p>2500-3000 cal/day</p></div>
+                    <div class="info-card"><i class="fas fa-couch"></i><h4>Sedentary</h4><p>1600-2000 cal/day</p></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Goals Section -->
+        <section class="content-section" id="section-goals">
+            <div class="section-header">
+                <h1><i class="fas fa-bullseye"></i> Health Goals</h1>
+                <p class="section-subtitle">Set and track your wellness targets</p>
+            </div>
+            <div class="goal-form-card">
+                <form id="goalForm" class="goal-form">
+                    <div class="form-row">
+                        <div class="form-group flex-2">
+                            <input type="text" id="goalTitle" placeholder="Goal title (e.g. Lose 5kg)" required>
+                        </div>
+                        <div class="form-group">
+                            <select id="goalCategory">
+                                <option value="weight">⚖️ Weight</option>
+                                <option value="fitness">💪 Fitness</option>
+                                <option value="nutrition">🥗 Nutrition</option>
+                                <option value="sleep">😴 Sleep</option>
+                                <option value="general">🎯 General</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="goalTarget" placeholder="Target (e.g. 70kg)">
+                        </div>
+                        <div class="form-group">
+                            <input type="date" id="goalDeadline">
+                        </div>
+                        <button type="submit" class="btn-primary"><i class="fas fa-plus"></i> Add</button>
+                    </div>
+                </form>
+            </div>
+            <div id="goalsList" class="goals-list">
+                {% for g in data.goals %}
+                <div class="goal-item {{ 'completed' if g.completed }}" data-id="{{ g.id }}">
+                    <button class="goal-check" onclick="toggleGoal({{ g.id }})">
+                        <i class="fas {{ 'fa-check-circle' if g.completed else 'fa-circle' }}"></i>
+                    </button>
+                    <div class="goal-info">
+                        <h4>{{ g.title }}</h4>
+                        <span class="goal-meta">{{ g.category }} {% if g.target %}| Target: {{ g.target }}{% endif %} {% if g.deadline %}| By: {{ g.deadline }}{% endif %}</span>
+                    </div>
+                    <button class="goal-delete" onclick="deleteGoal({{ g.id }})"><i class="fas fa-trash"></i></button>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Reminders Section -->
+        <section class="content-section" id="section-reminders">
+            <div class="section-header">
+                <h1><i class="fas fa-bell"></i> Health Reminders</h1>
+                <p class="section-subtitle">Never miss a healthy habit</p>
+            </div>
+            <div class="reminder-form-card">
+                <form id="reminderForm" class="reminder-form">
+                    <div class="form-row">
+                        <div class="form-group flex-2">
+                            <input type="text" id="reminderTitle" placeholder="Reminder (e.g. Drink water)" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="time" id="reminderTime" required>
+                        </div>
+                        <div class="form-group">
+                            <select id="reminderRepeat">
+                                <option value="daily">Daily</option>
+                                <option value="weekdays">Weekdays</option>
+                                <option value="weekly">Weekly</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary"><i class="fas fa-plus"></i> Add</button>
+                    </div>
+                </form>
+            </div>
+            <div id="remindersList" class="reminders-list">
+                {% for r in data.reminders %}
+                <div class="reminder-item" data-id="{{ r.id }}">
+                    <div class="reminder-icon"><i class="fas fa-bell"></i></div>
+                    <div class="reminder-info">
+                        <h4>{{ r.title }}</h4>
+                        <span>{{ r.time }} | {{ r.repeat }}</span>
+                    </div>
+                    <button class="reminder-delete" onclick="deleteReminder({{ r.id }})"><i class="fas fa-trash"></i></button>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Profile Section -->
+        <section class="content-section" id="section-profile">
+            <div class="section-header">
+                <h1><i class="fas fa-user-cog"></i> Profile Settings</h1>
+                <p class="section-subtitle">Update your personal information</p>
+            </div>
+            <div class="profile-card">
+                <div class="profile-avatar">
+                    <i class="fas fa-user-circle"></i>
+                    <h3>{{ data.profile.name or 'User' }}</h3>
+                </div>
+                <form id="profileForm" class="profile-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" id="profileName" value="{{ data.profile.name }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Age</label>
+                            <input type="number" id="profileAge" value="{{ data.profile.age }}" min="1" max="150">
+                        </div>
+                        <div class="form-group">
+                            <label>Height (cm)</label>
+                            <input type="number" id="profileHeight" value="{{ data.profile.height }}" min="50" max="300" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label>Weight (kg)</label>
+                            <input type="number" id="profileWeight" value="{{ data.profile.weight }}" min="20" max="500" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label>Gender</label>
+                            <select id="profileGender">
+                                <option value="male" {{ 'selected' if data.profile.gender == 'male' }}>Male</option>
+                                <option value="female" {{ 'selected' if data.profile.gender == 'female' }}>Female</option>
+                                <option value="other" {{ 'selected' if data.profile.gender == 'other' }}>Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary btn-lg"><i class="fas fa-save"></i> Save Profile</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        const weeklyLogs = {{ weekly_logs|safe }};
+        const allLogs = {{ all_logs|safe }};
+    </script>
+    <script src="/static/script.js"></script>
+</body>
+</html>

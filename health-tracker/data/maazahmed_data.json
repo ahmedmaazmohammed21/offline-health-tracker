@@ -1,0 +1,43 @@
+{
+  "profile": {
+    "name": "maaz",
+    "age": 18,
+    "height": 173.7,
+    "weight": 85.0,
+    "gender": "male"
+  },
+  "daily_logs": [
+    {
+      "date": "2026-03-30",
+      "calories": 4500,
+      "water": 9,
+      "sleep": 5.0,
+      "steps": 6000,
+      "exercise": 15,
+      "mood": "good",
+      "notes": "good"
+    }
+  ],
+  "goals": [],
+  "reminders": [
+    {
+      "id": 1774855453.885041,
+      "title": "have lunch ",
+      "time": "01:00",
+      "repeat": "daily",
+      "active": true
+    },
+    {
+      "id": 1774855484.891922,
+      "title": "drink water ",
+      "time": "12:55",
+      "repeat": "daily",
+      "active": true
+    }
+  ],
+  "streaks": {
+    "current": 1,
+    "best": 1,
+    "last_log_date": "2026-03-30"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "profile": {
+    "name": "mohd maaz ahmed",
+    "age": 18,
+    "height": 165.0,
+    "weight": 85.0,
+    "gender": "male"
+  },
+  "daily_logs": [
+    {
+      "date": "2026-03-31",
+      "calories": 3000,
+      "water": 8,
+      "sleep": 5.0,
+      "steps": 4000,
+      "exercise": 10,
+      "mood": "good",
+      "notes": "good"
+    }
+  ],
+  "goals": [],
+  "reminders": [
+    {
+      "id": 1775022111.232268,
+      "title": "sleep early",
+      "time": "23:00",
+      "repeat": "daily",
+      "active": true
+    }
+  ],
+  "streaks": {
+    "current": 1,
+    "best": 1,
+    "last_log_date": "2026-03-31"
+  }
+}

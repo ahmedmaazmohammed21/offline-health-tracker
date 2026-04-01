@@ -1,0 +1,46 @@
+{
+  "profile": {
+    "name": "anil",
+    "age": 19,
+    "height": 179.0,
+    "weight": 72.0,
+    "gender": "male"
+  },
+  "daily_logs": [
+    {
+      "date": "2026-03-30",
+      "calories": 5000,
+      "water": 3,
+      "sleep": 4.0,
+      "steps": 2300,
+      "exercise": 0,
+      "mood": "terrible",
+      "notes": "not good "
+    }
+  ],
+  "goals": [
+    {
+      "id": 1774853726.908145,
+      "title": "loss 5  kg ",
+      "target": "85",
+      "category": "weight",
+      "deadline": "2026-03-30",
+      "completed": false,
+      "created": "2026-03-30T12:25:26.908154"
+    }
+  ],
+  "reminders": [
+    {
+      "id": 1774853774.884584,
+      "title": "drink water ",
+      "time": "09:30",
+      "repeat": "daily",
+      "active": true
+    }
+  ],
+  "streaks": {
+    "current": 1,
+    "best": 1,
+    "last_log_date": "2026-03-30"
+  }
+}

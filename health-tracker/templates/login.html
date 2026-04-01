@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthPulse - Login</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="login-body">
+    <div class="login-container">
+        <div class="login-left">
+            <div class="login-branding">
+                <div class="login-logo"><i class="fas fa-heartbeat"></i></div>
+                <h1>HealthPulse</h1>
+                <p>Your personal offline health companion.<br>Track. Analyze. Thrive.</p>
+                <div class="login-features">
+                    <div class="login-feature"><i class="fas fa-chart-line"></i><span>Analytics & Charts</span></div>
+                    <div class="login-feature"><i class="fas fa-bullseye"></i><span>Goal Tracking</span></div>
+                    <div class="login-feature"><i class="fas fa-fire"></i><span>Streaks & Motivation</span></div>
+                    <div class="login-feature"><i class="fas fa-bell"></i><span>Smart Reminders</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="login-right">
+            <div class="login-form-wrapper">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                    <div class="flash flash-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+
+                <div id="loginSection">
+                    <h2>Welcome Back</h2>
+                    <p class="form-subtitle">Sign in to continue your health journey</p>
+                    <form method="POST" action="/login" class="auth-form">
+                        <div class="input-group">
+                            <i class="fas fa-user"></i>
+                            <input type="text" name="username" placeholder="Username" required autocomplete="username">
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" name="password" placeholder="Password" required autocomplete="current-password">
+                        </div>
+                        <button type="submit" class="btn-auth">Sign In <i class="fas fa-arrow-right"></i></button>
+                    </form>
+                    <p class="switch-text">Don't have an account? <a href="#" onclick="toggleAuth()">Create one</a></p>
+                </div>
+
+                <div id="registerSection" style="display:none;">
+                    <h2>Create Account</h2>
+                    <p class="form-subtitle">Start tracking your health today</p>
+                    <form method="POST" action="/register" class="auth-form">
+                        <div class="input-group">
+                            <i class="fas fa-id-card"></i>
+                            <input type="text" name="name" placeholder="Full Name" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-user"></i>
+                            <input type="text" name="username" placeholder="Choose Username" required autocomplete="username">
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" name="password" placeholder="Create Password" required autocomplete="new-password">
+                        </div>
+                        <button type="submit" class="btn-auth btn-register">Create Account <i class="fas fa-user-plus"></i></button>
+                    </form>
+                    <p class="switch-text">Already have an account? <a href="#" onclick="toggleAuth()">Sign in</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function toggleAuth() {
+            const login = document.getElementById('loginSection');
+            const register = document.getElementById('registerSection');
+            login.style.display = login.style.display === 'none' ? 'block' : 'none';
+            register.style.display = register.style.display === 'none' ? 'block' : 'none';
+        }
+    </script>
+</body>
+</html>
